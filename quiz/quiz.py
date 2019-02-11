@@ -1,3 +1,4 @@
+import difflib
 
 def show_menu():
     print("1. Ask questions")
@@ -6,14 +7,62 @@ def show_menu():
     
     option = input("Enter option: ")
     return option
+
+def ask_questions():
+    questions = []
+    answers = []
+    
+    with open("questions.txt", "r") as file:
+        lines = file.read().splitlines()
+    
+    for i, text in enumerate(lines):
+        if i%2 == 0:
+            questions.append(text)
+        else:
+            answers.append(text)
+    
+    number_of_questions = len(questions)
+    questions_and_answers = zip(questions, answers)
+    
+    score = 0
+            
+    for question, answer in questions_and_answers:
+        guess = input(question + "> ")
+        if guess == answer:
+            score += 1
+            print("right!")
+            print(score)
+        else:
+            if (sum([i[0] != ' '  for i in difflib.ndiff(guess, answer)]) / 2) <= 2:
+                print(sum([i[0] != ' '  for i in difflib.ndiff(guess, answer)]))
+                print("Spelled wrong, but right!")
+                score += 1
+                print(score)
+            else:
+                print("wrong!")
+    
+    print("You got {0} correct out of {1}".format(score, number_of_questions))
+    
+def add_question():
+    print("")
+    question = input("Enter a question\n> ")
+    
+    print("")
+    print("OK then, tell me the answer")
+    answer = input("{0}\n> ".format(question))
+    
+    file = open("questions.txt","a")
+    file.write(question + "\n")
+    file.write(answer + "\n")
+    file.close()
     
 def game_loop():
     while True:
         option = show_menu()
         if option == "1":
-            print ("You selected 'Ask a question option'")
+            ask_questions()
         elif option == "2":
-            print ("You selected 'Add a question option'")
+            add_question()
         elif option == "3":
             break
         else:
@@ -21,4 +70,3 @@ def game_loop():
         print("")
         
 game_loop()
-    
